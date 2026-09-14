@@ -19,10 +19,14 @@ namespace Tymchuk_Petro_IPZ_32_Duplocate_Detector
             IDirectoryScannerInterface directoryScannerItem = new DirectoryScannerService();
             IDuplicateDetectionService duplicateDetectionItem = new DuplicateDetectionService();
 
-            IConsoleUserInterfaceHandler userInterfaceItem = new ConsoleUserInterfaceHandler(
-                pathValidatorItem,
+            IBenchmarkRunnerService benchmarkRunnerItem = new BenchmarkRunnerService(
                 directoryScannerItem,
                 duplicateDetectionItem
+            );
+
+            IConsoleUserInterfaceHandler userInterfaceItem = new ConsoleUserInterfaceHandler(
+                pathValidatorItem,
+                benchmarkRunnerItem
             );
 
             await userInterfaceItem.RunAsync();

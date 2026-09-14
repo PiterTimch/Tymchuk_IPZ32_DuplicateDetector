@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Tymchuk_Petro_IPZ_32_Duplocate_Detector.Abstractions;
 using Tymchuk_Petro_IPZ_32_Duplocate_Detector.Models;
@@ -10,17 +9,14 @@ namespace Tymchuk_Petro_IPZ_32_Duplocate_Detector.Handlers
     public class ConsoleUserInterfaceHandler : IConsoleUserInterfaceHandler
     {
         private readonly IValidatorInterface<string> pathValidatorItem;
-        private readonly IDirectoryScannerInterface directoryScannerItem;
-        private readonly IDuplicateDetectionService duplicateDetectionItem;
+        private readonly IBenchmarkRunnerService benchmarkRunnerItem;
 
         public ConsoleUserInterfaceHandler(
             IValidatorInterface<string> pathValidatorItem,
-            IDirectoryScannerInterface directoryScannerItem,
-            IDuplicateDetectionService duplicateDetectionItem)
+            IBenchmarkRunnerService benchmarkRunnerItem)
         {
             this.pathValidatorItem = pathValidatorItem;
-            this.directoryScannerItem = directoryScannerItem;
-            this.duplicateDetectionItem = duplicateDetectionItem;
+            this.benchmarkRunnerItem = benchmarkRunnerItem;
         }
 
         public async Task RunAsync()
@@ -29,15 +25,11 @@ namespace Tymchuk_Petro_IPZ_32_Duplocate_Detector.Handlers
 
             string folderPathText = ReadValidFolderPath();
 
-            Console.WriteLine("Scanning directory for files...");
-            Stopwatch timerItem = Stopwatch.StartNew();
+            Console.WriteLine("Running BenchmarkDotNet for scanning and duplicate detection...");
 
-            IEnumerable<FileInfoModel> filesList = directoryScannerItem.ScanDirectory(folderPathText);
-            List<DuplicateGroupResult> duplicatesList = await duplicateDetectionItem.FindDuplicatesAsync(filesList);
+            BenchmarkExecutionResultModel benchmarkResultItem = await benchmarkRunnerItem.RunBenchmarkAsync(folderPathText);
 
-            timerItem.Stop();
-
-            DisplayResults(duplicatesList, timerItem.ElapsedMilliseconds);
+            DisplayResults(benchmarkResultItem.DuplicatesList);
         }
 
         private string ReadValidFolderPath()
@@ -58,10 +50,10 @@ namespace Tymchuk_Petro_IPZ_32_Duplocate_Detector.Handlers
             }
         }
 
-        private void DisplayResults(List<DuplicateGroupResult> duplicatesList, long elapsedMilliseconds)
+        private void DisplayResults(List<DuplicateGroupResult> duplicatesList)
         {
             Console.WriteLine();
-            Console.WriteLine("Scan Completed in " + elapsedMilliseconds + " ms.");
+            Console.WriteLine("Benchmark Completed.");
             Console.WriteLine("Found duplicate groups: " + duplicatesList.Count);
             Console.WriteLine();
 
