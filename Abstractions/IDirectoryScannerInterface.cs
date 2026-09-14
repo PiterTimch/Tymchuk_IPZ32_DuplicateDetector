@@ -5,6 +5,6 @@ namespace Tymchuk_Petro_IPZ_32_Duplocate_Detector.Abstractions
 {
     public interface IDirectoryScannerInterface
     {
-        List<FileInfoModel> ScanDirectory(string path);
+        IEnumerable<FileInfoModel> ScanDirectory(string path);
     }
 }
